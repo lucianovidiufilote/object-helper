@@ -1,0 +1,21 @@
+{
+  "name": "lucianovidiufilote/object-helper",
+  "description": "PHP object helper library",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Lucian Filote",
+      "email": "lucian.filote@gmail.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "require": {
+    "php": ">=7.2.0"
+  },
+  "version": "1.0.0",
+  "autoload": {
+    "psr-4": {
+      "LucianOvidiuFilote\\ObjectHelper\\": "src/"
+    }
+  }
+}
