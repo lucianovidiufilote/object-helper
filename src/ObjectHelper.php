@@ -11,30 +11,37 @@ class ObjectHelper
     /**
      * Class casting
      *
-     * @param string|object $destination
-     * @param object $sourceObject
-     * @return object
+     * @param $object
+     * @return array
      */
-    public static function cast($destination, $sourceObject)
+    public static function toArray($object)
     {
-        if (is_string($destination)) {
-            $destination = new $destination();
+        $public = [];
+
+        $reflection = new \ReflectionClass(get_class($object));
+
+        foreach ($reflection->getProperties() as $property) {
+            $property->setAccessible(true);
+
+            $value = $property->getValue($object);
+            $name = $property->getName();
+
+            if (is_array($value)) {
+                $public[$name] = [];
+
+                foreach ($value as $item) {
+                    if (is_object($item)) {
+                        $itemArray = self::toArray($item);
+                        $public[$name][] = $itemArray;
+                    } else {
+                        $public[$name][] = $item;
+                    }
+                }
+            } else if (is_object($value)) {
+                $public[$name] = self::toArray($value);
+            } else $public[$name] = $value;
         }
-        $sourceReflection = new \ReflectionObject($sourceObject);
-        $destinationReflection = new \ReflectionObject($destination);
-        $sourceProperties = $sourceReflection->getProperties();
-        foreach ($sourceProperties as $sourceProperty) {
-            $sourceProperty->setAccessible(true);
-            $name = $sourceProperty->getName();
-            $value = $sourceProperty->getValue($sourceObject);
-            if ($destinationReflection->hasProperty($name)) {
-                $propDest = $destinationReflection->getProperty($name);
-                $propDest->setAccessible(true);
-                $propDest->setValue($destination,$value);
-            } else {
-                $destination->$name = $value;
-            }
-        }
-        return $destination;
+
+        return $public;
     }
 }
